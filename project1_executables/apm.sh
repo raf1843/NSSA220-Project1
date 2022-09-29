@@ -20,7 +20,12 @@ collect_ps(){
 
 # Collect system metrics
 collect_sys(){
-  echo
+	net_rrate=$(ifstat ens33 | sed -n '4p' | xargs | cut -f 7 -d ' ')
+	net_trate=$(ifstat ens33 | sed -n '4p' | xargs | cut -f 9 -d ' ')
+	
+	hd_write=$(iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ')
+
+	hd_util=$(df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ')
 }
 
 # Clean up
