@@ -15,7 +15,8 @@ spawn(){
 
 # Collect process metrics
 collect_ps(){
-  echo
+  #echo
+  #ps -U root -u root u|format
 }
 
 # Collect system metrics
@@ -32,5 +33,7 @@ trap cleanup EXIT
 # main
 
 spawn
-collect_ps
-collect_sys
+#while
+	#sleep 5
+	collect_ps
+	collect_sys
