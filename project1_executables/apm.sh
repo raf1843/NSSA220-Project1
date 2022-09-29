@@ -6,10 +6,14 @@
 
 # Spawn processes
 spawn(){
-  #need "ifstat -d |"
+  # hardcoded gateway address
+  gway='192.168.182.2'
+  ifstat -d 1
   for((i=1; $i <= 6; i++))
   do
-    echo $i
+    psname="APM${i}"
+    chmod 755 $psname
+    ./$psname $gway
   done 
 }
 
@@ -25,7 +29,13 @@ collect_sys(){
 
 # Clean up
 cleanup(){
-  echo
+  pkill ifstat
+  for((i=1; $i <= 6; i++))
+  do
+    psname="APM${i}"
+    chmod 755 $psname
+    pkill $psname
+  done
 }
 trap cleanup EXIT
 
