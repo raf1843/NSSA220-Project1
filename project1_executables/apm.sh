@@ -14,7 +14,10 @@ spawn(){
     psname="APM${i}"
     chmod 755 $psname
     ./$psname $gway &
+    echo Seconds,%CPU,%Memory > "${psname}_metrics.csv"
   done 
+  # also start csv file for system
+  echo Seconds,RX Data Rate,TX Data Rate,Disk Writes,Available Disk Capacity > system_metrics.csv
 }
 
 # Collect process metrics
@@ -33,8 +36,7 @@ cleanup(){
   for((i=1; $i <= 6; i++))
   do
     psname="APM${i}"
-    chmod 755 $psname
-    pkill $psname
+    pkill $psname   # would like to figure out how to make this silent
   done
 }
 trap cleanup EXIT
@@ -42,5 +44,8 @@ trap cleanup EXIT
 # main
 
 spawn
-collect_ps
-collect_sys
+while true
+do
+  collect_ps
+  collect_sys
+done
