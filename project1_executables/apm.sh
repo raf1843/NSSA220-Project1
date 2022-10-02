@@ -13,7 +13,7 @@ spawn(){
   do
     psname="APM${i}"
     chmod 755 $psname
-    ./$psname $gway
+    ./$psname $gway &
   done 
 }
 
