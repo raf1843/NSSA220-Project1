@@ -6,8 +6,9 @@
 
 # Spawn processes
 spawn(){
-  # hardcoded gateway address
-  gway=$( ping -b 192.168.194.255 -c 1 2>/dev/null | sed -n '2p' | cut -f 4 -d ' ' | sed s/://g )
+  # get gateway address
+  bc=$( ifconfig ens33 | sed -n '2p' | xargs | cut -f 6 -d ' ' )
+  gway=$( ping -b $bc -c 1 2>/dev/null | sed -n '2p' | cut -f 4 -d ' ' | sed s/://g )
   ifstat -d 1
   # start processes and csv files
   for((i=1; i <= 6; i++))
