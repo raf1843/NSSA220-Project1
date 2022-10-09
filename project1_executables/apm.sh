@@ -7,10 +7,10 @@
 # Spawn processes
 spawn(){
   # hardcoded gateway address
-  gway='192.168.182.2'
+  gway=$( ping -b 192.168.194.255 -c 1 2>/dev/null | sed -n '2p' | cut -f 4 -d ' ' | sed s/://g )
   ifstat -d 1
   # start processes and csv files
-  for((i=1; $i <= 6; i++))
+  for((i=1; i <= 6; i++))
   do
     psname="APM${i}"
     chmod 755 $psname
@@ -28,10 +28,10 @@ collect_ps(){
 
 # Collect system metrics
 collect_sys(){
-  net_rrate=$(ifstat -a ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 7 -d ' ')
-  net_trate=$(ifstat -a ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ')
-  hd_write=$(iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ')
-  hd_util=$(df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ')
+  net_rrate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 7 -d ' ' | sed s/K//g )
+  net_trate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ' | sed s/K//g )
+  hd_write=$( iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ' )
+  hd_util=$( df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ' )
   echo "$SECONDS,$net_rrate,$net_trate,$hd_write,$hd_util" >> system_metrics.csv
 }
 
@@ -41,8 +41,11 @@ cleanup(){
   for((i=1; $i <= 6; i++))
   do
     psname="APM${i}"
-    pkill $psname  # would like to figure out how to make this silent
+    id=$(pidof $psname)
+    kill -9 $id
+    wait $id 2>/dev/null  # this allows for silent kill
   done
+  echo # new line after CTRL-C
   echo "Check output in <ps_name>_metrics.csv and system_metrics.csv files"
 }
 trap cleanup EXIT
