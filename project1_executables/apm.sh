@@ -16,8 +16,8 @@ spawn(){
 # Collect process metrics
 collect_ps(){
   #2 cpu 3 Mem
-  cpu_percent=$(ps -U root -u root u| cut -f 2 -d ' ')
-  mem_percent=$(ps -U root -u root u| cut -f 3 -d ' ')
+  cpu_percent=$(ps -U root -u root u| sed -n '2p' | xargs| cut -f 3 -d ' ')
+  mem_percent=$(ps -U root -u root u| sed -n '2p' | xargs| cut -f 4 -d ' ')
   echo "$SECONDS, $cpu_percent, $mem_percent" >> ps_metrics.csv
 }
 
