@@ -37,8 +37,12 @@ cleanup(){
   for((i=1; $i <= 6; i++))
   do
     psname="APM${i}"
-    pkill $psname   # would like to figure out how to make this silent
+    id=$(pidof $psname)
+    kill -9 $id
+    wait $id 2>/dev/null  # this allows for silent kill
   done
+  echo # new line after CTRL-C
+  echo "Check output in <ps_name>_metrics.csv and system_metrics.csv files"
 }
 trap cleanup EXIT
 
