@@ -12,6 +12,7 @@ spawn(){
   ifstat -d 1
   # start processes and csv files
   for((i=1; i <= 6; i++))
+  
   do
     psname="APM${i}"
     chmod 755 $psname
@@ -33,6 +34,7 @@ collect_sys(){
   net_trate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ' | sed s/K//g )
   hd_write=$( iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ' )
   hd_util=$( df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ' )
+
   echo "$SECONDS,$net_rrate,$net_trate,$hd_write,$hd_util" >> system_metrics.csv
 }
 
