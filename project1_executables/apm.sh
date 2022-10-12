@@ -10,7 +10,9 @@ spawn(){
   bc=$( ifconfig ens33 | sed -n '2p' | xargs | cut -f 6 -d ' ' )
   gway=$( ping -b $bc -c 1 2>/dev/null | sed -n '2p' | cut -f 4 -d ' ' | sed s/://g )
   ifstat -d 1
-  for((i=1; $i <= 6; i++))
+  # start processes and csv files
+  for((i=1; i <= 6; i++))
+  
   do
     psname="APM${i}"
     chmod 755 $psname
@@ -28,7 +30,12 @@ collect_ps(){
 
 # Collect system metrics
 collect_sys(){
-  echo
+  net_rrate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 7 -d ' ' | sed s/K//g )
+  net_trate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ' | sed s/K//g )
+  hd_write=$( iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ' )
+  hd_util=$( df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ' )
+
+  echo "$SECONDS,$net_rrate,$net_trate,$hd_write,$hd_util" >> system_metrics.csv
 }
 
 # Clean up
@@ -51,6 +58,8 @@ trap cleanup EXIT
 spawn
 while true
 do
+  sleep 5
   collect_ps
   collect_sys
 done
+
