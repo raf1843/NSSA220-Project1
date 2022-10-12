@@ -12,7 +12,6 @@ spawn(){
   ifstat -d 1
   # start processes and csv files
   for((i=1; i <= 6; i++))
-  
   do
     psname="APM${i}"
     chmod 755 $psname
