@@ -6,11 +6,12 @@
 
 # Spawn processes
 spawn(){
-  # hardcoded gateway address
-  gway='192.168.182.2'
+  # get gateway address
+  bc=$( ifconfig ens33 | sed -n '2p' | xargs | cut -f 6 -d ' ' )
+  gway=$( ping -b $bc -c 1 2>/dev/null | sed -n '2p' | cut -f 4 -d ' ' | sed s/://g )
   ifstat -d 1
   # start processes and csv files
-  for((i=1; $i <= 6; i++))
+  for((i=1; i <= 6; i++))
   do
     psname="APM${i}"
     chmod 755 $psname
@@ -35,11 +36,10 @@ collect_ps(){
 
 # Collect system metrics
 collect_sys(){
-  # NOTE: need to figure out how to cut the 'k' off - something with sed?
-  net_rrate=$(ifstat -a ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 7 -d ' ')
-  net_trate=$(ifstat -a ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ')
-  hd_write=$(iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ')
-  hd_util=$(df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ')
+  net_rrate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 7 -d ' ' | sed s/K//g )
+  net_trate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ' | sed s/K//g )
+  hd_write=$( iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ' )
+  hd_util=$( df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ' )
   echo "$SECONDS,$net_rrate,$net_trate,$hd_write,$hd_util" >> system_metrics.csv
 }
 
