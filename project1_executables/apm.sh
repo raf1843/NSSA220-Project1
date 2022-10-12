@@ -24,7 +24,14 @@ spawn(){
 
 # Collect process metrics
 collect_ps(){
-  echo
+  #2 cpu 3 Mem
+  for((i=1; i <= 6; i++))
+  do
+    name="APM${i}"
+    cpu_percent=$(ps aux| grep ${name}| xargs| cut -f 3 -d ' ')
+    mem_percent=$(ps aux| grep ${name}| xargs| cut -f 4 -d ' ')
+    echo "$SECONDS, $cpu_percent, $mem_percent" >> ${name}_metrics.csv
+  done
 }
 
 # Collect system metrics
@@ -33,7 +40,6 @@ collect_sys(){
   net_trate=$( ifstat ens33 2>/dev/null | sed -n '4p' | xargs | cut -f 9 -d ' ' | sed s/K//g )
   hd_write=$( iostat sda | sed -n '7p' | xargs | cut -f 4 -d ' ' )
   hd_util=$( df -hm / | sed -n '2p' | xargs | cut -f 4 -d ' ' )
-
   echo "$SECONDS,$net_rrate,$net_trate,$hd_write,$hd_util" >> system_metrics.csv
 }
 
@@ -53,7 +59,6 @@ cleanup(){
 trap cleanup EXIT
 
 # main
-
 spawn
 while true
 do
@@ -61,4 +66,3 @@ do
   collect_ps
   collect_sys
 done
-
